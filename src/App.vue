@@ -1,30 +1,99 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div class="login-page">
+    <div class="login-page__login-card">
+      <a-form class="login-page__login-card__form">
+        <a-form-item v-bind="validateInfos.account">
+          <a-input
+            v-model:value="formData.account"
+            size="large"
+            placeholder="请输入账号"
+          >
+            <template #prefix>
+              <UserOutlined
+                :style="{
+                  color: '#235dff',
+                }"
+              />
+            </template>
+          </a-input>
+        </a-form-item>
+        <a-form-item v-bind="validateInfos.password">
+          <a-input-password
+            v-model:value="formData.password"
+            size="large"
+            placeholder="请输入密码"
+          >
+            <template #prefix>
+              <LockOutlined
+                :style="{
+                  color: '#235dff',
+                }"
+              />
+            </template>
+          </a-input-password>
+        </a-form-item>
+        <a-form-item>
+          <a-button
+            type="primary"
+            size="large"
+            class="login-page__login-card__form__login-button"
+            @click="() => onClickLogin()"
+          >
+            登录
+          </a-button>
+        </a-form-item>
+      </a-form>
+    </div>
   </div>
-  <router-view />
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import { Form } from "ant-design-vue";
+import { defineComponent, reactive, ref } from "vue";
 
-#nav {
-  padding: 30px;
+export default defineComponent({
+  setup() {
+    const isLoading = ref(false);
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+    /**
+     * 表单数据
+     */
+    const formData = reactive({
+      account: "",
+      password: "",
+    });
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+    const rulesRef = reactive({
+      account: [
+        {
+          required: true,
+          message: "请输入账号",
+        },
+      ],
+      password: [
+        {
+          required: true,
+          message: "请输入密码",
+        },
+      ],
+    });
+
+    const { validateInfos, validate } = Form.useForm(formData, rulesRef);
+
+    const onClickLogin = async function onClickLogin() {
+      isLoading.value = true;
+
+      await validate();
+
+      isLoading.value = false;
+    };
+
+    return {
+      isLoading,
+      formData,
+      validateInfos,
+      onClickLogin,
+    };
+  },
+});
+</script>
